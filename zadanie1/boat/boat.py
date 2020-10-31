@@ -1,5 +1,5 @@
-from common.vector3 import Vector3
-from common.connection import Connection
+from vector3 import Vector3
+from connection import Connection
 import random
 
 class Boat:

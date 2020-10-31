@@ -1,7 +1,11 @@
 import http.server
 import socketserver
-from common.vector3 import Vector3
-from common.boat_request_handler import BoatHTTPRequestHandler
+import signal
+import sys
+
+
+from boat_request_handler import BoatHTTPRequestHandler
+
 
 
 class Server():
@@ -11,7 +15,6 @@ class Server():
         self.handler = BoatHTTPRequestHandler
     def run(self):
         with socketserver.TCPServer(("", self.port), self.handler) as httpd:
+            httpd.allow_reuse_address = True
             print("serving at port", self.port)
             httpd.serve_forever()
-
-        

@@ -1,5 +1,4 @@
 import requests
-from common.vector3 import Vector3
 import json
 
 class Connection:

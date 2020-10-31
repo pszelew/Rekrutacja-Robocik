@@ -1,4 +1,4 @@
-from common.vector3 import Vector3
+from vector3 import Vector3
 from boat import Boat
 import time
 
@@ -12,7 +12,10 @@ def run(t: float, n: int, url: str):
     for i in range(n):
         boat.rand_move()
         print(f"Sending pos! {boat.pos.x}, {boat.pos.y}, {boat.pos.z}")
-        boat.send_pos()
+        try:
+            boat.send_pos()
+        except:
+            print("Nie udalo sie wyslac pozycji! Serwer nie odpowiada?")
         time.sleep(t)
         i+=1
     boat.end_journey()
