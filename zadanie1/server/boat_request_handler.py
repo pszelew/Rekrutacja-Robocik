@@ -14,6 +14,7 @@ class BoatHTTPRequestHandler(BaseHTTPRequestHandler):
         post_data = self.rfile.read(content_length)
         dic_data = json.loads(post_data)
         if "kill" in dic_data:
+            print("Otrzymano sygnal kill. Wylaczanie serwera!")
             exit()
         pos = Vector3(dic_data["pos_x"], dic_data["pos_y"], dic_data["pos_z"])
         print("Lodz osiagnela zawratna predkosc {:.2f} m/s!".format(pos.dist(last_pos)))

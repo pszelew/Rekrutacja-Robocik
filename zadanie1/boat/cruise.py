@@ -8,10 +8,10 @@ def run(t: float, n: int, url: str):
     i = 0
     in_pos = Vector3(0,0,0)
     boat = Boat(pos=in_pos, url=url)
-    print("Starting boat! Let's dive")
+    print("Inicjuje lodz! Zaczynamy!")
     for i in range(n):
         boat.rand_move()
-        print(f"Sending pos! {boat.pos.x}, {boat.pos.y}, {boat.pos.z}")
+        print(f"Wysylam pozycje! {boat.pos.x}, {boat.pos.y}, {boat.pos.z}")
         try:
             boat.send_pos()
         except:
@@ -19,7 +19,7 @@ def run(t: float, n: int, url: str):
         time.sleep(t)
         i+=1
     boat.end_journey()
-    print("Sending end!")
+    print("Koncze podroz!")
 
 
 

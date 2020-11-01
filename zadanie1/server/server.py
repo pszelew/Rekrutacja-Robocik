@@ -15,6 +15,7 @@ class Server():
         self.handler = BoatHTTPRequestHandler
     def run(self):
         with socketserver.TCPServer(("", self.port), self.handler) as httpd:
+            print("Start serwera na", self.url+":"+str(self.port))
             httpd.allow_reuse_address = True
-            print("serving at port", self.port)
             httpd.serve_forever()
+            
