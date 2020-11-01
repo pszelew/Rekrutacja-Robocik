@@ -30,6 +30,7 @@ class Vector3:
         z: float
             Value of z-axis
         """
+        self.
         self.x = x
         self.y = y
         self.z = z
@@ -39,6 +40,7 @@ class Vector3:
         ----------
         sec_vec: Vector3
             Second point of operation
+
         Returns
         -------
         float
