@@ -17,6 +17,7 @@ def run(t: float, n: int, url: str):
     i = 0
     in_pos = Vector3(0,0,0)
     boat = Boat(pos=in_pos, url=url)
+    # Create boat objects
     print("Inicjuje lodz! Zaczynamy!")
     for i in range(n):
         boat.rand_move()

@@ -31,3 +31,4 @@ class Connection:
             Message to be sent
         """
         requests.post(url=self.url, data=json.dumps(message))
+        # Send data

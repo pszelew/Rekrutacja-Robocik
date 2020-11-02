@@ -50,5 +50,6 @@ class Vector3:
         res = math.sqrt((self.x - sec_vec.x)**2 
                 + (self.y - sec_vec.y)**2
                 + (self.y - sec_vec.y)**2)
+        # Calculate distance between two points
         return res
                     
