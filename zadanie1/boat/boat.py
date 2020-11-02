@@ -8,9 +8,9 @@ class Boat:
 
     Attributes
     ----------
-    pos : Vector3
+    pos: Vector3
         3D Vector containing current submarine position
-    con : Connection
+    con: Connection
         Connection manager
 
     Methods
@@ -41,6 +41,7 @@ class Boat:
     def rand_move(self):
         """Do random move in scene coordinates (absolute) [-5:5, -5:0, -5:5]"""
         rand_pos: Vector3
+        rand_pos = Vector3(0, 0, 0)
         rand_pos.x = random.uniform(-5.0, 5.0)
         # Random move [-5.0, 5.0]
         rand_pos.y = random.uniform(-5.0, 0)

@@ -30,7 +30,6 @@ class Vector3:
         z: float
             Value of z-axis
         """
-        self.
         self.x = x
         self.y = y
         self.z = z

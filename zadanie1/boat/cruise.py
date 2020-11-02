@@ -1,7 +1,9 @@
 from vector3 import Vector3
 from boat import Boat
 import time
-""" Starts our wonderful journey through seas 
+
+def run(t: float, n: int, url: str):
+    """ Starts our wonderful journey through seas 
         Parameters
         ----------
         t: float
@@ -10,8 +12,7 @@ import time
             How many moves before and of journey
         url: str
             Adress of server collecting data from boat
-"""
-def run(t: float, n: int, url: str):
+    """
     assert t > 0, "n powinno byc > 0"
     assert n >= 5, "n powinno byc rowne co najmniej 5"
     i = 0
