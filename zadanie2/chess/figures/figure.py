@@ -45,11 +45,15 @@ class Figure(ABC):
         self.pos_moves: list[PossibleMove]
         self.pos_moves = []
     def __repr__(self):
+        """
+        """
         if self.color == Color.BLACK:
             return "black_" + self.name
         else:
             return "white_" + self.name
     def __str__(self):
+        """
+        """
         if self.color == Color.BLACK:
             return "black_" + self.name
         else:
