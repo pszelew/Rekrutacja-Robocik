@@ -7,13 +7,18 @@
 Zrealizowano zadania: 1 oraz 2
 
 ## Jak to uruchomić?
+W odpowiednim katalogu wpisz:
+* **zadanie1**
+	
+	- **python server http://localhost 8080** (przykład)
+	- **python boat 10.0 10 http://localhost:8080** (przykład)
+	- **python server** (by uzyskać pomoc)
+	- **python server** (by uzyskać pomoc)
 
+* **zadanie2** 
+	- **python chess board.state** (przykład)
 
 
 ## Autorzy
 
 * **Patryk Szelewski** - [GitHub](https://github.com/pszelew)
-* **Daniel Ślwiowski** - [GitHub](https://github.com/DSliwowski1)
-* **Jakub Tomaszewski** - [GitHub](https://github.com/TomaszewskiJakub)
-## Co dalej?
-* Algorytm wykrywania pasa ruchu w oparciu o Deep Learning
