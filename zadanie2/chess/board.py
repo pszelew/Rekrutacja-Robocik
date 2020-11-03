@@ -35,8 +35,8 @@ class Board:
         """
         self.dic_ver: dict
         self.dic_hor: dict
-        self.dic_ver = {0: "a", 1: "b", 2: "c", 3: "d", 4: "e", 5: "f", 6: "g", 7: "h"}
-        self.dic_hor = {0: "8", 1: "7", 2: "6", 3: "5", 4: "4", 5: "3", 6: "2", 7: "1"}
+        self.dic_hor = {0: "a", 1: "b", 2: "c", 3: "d", 4: "e", 5: "f", 6: "g", 7: "h"}
+        self.dic_ver = {0: "8", 1: "7", 2: "6", 3: "5", 4: "4", 5: "3", 6: "2", 7: "1"}
         with open(file) as f:
             raw_data = f.read()
         raw_data = raw_data.replace("[", "").replace("]", ",")
@@ -341,7 +341,7 @@ class Board:
                                 return True                       
         return False
         
-    def check_mate(self, col: Color) -> tuple[int, int, int, int]:
+    def check_mate(self, col: Color) -> list[tuple[int, int, int, int]]:
         """Checks possibilities of winning by chosen player
         Parameters
         ----------
@@ -350,7 +350,7 @@ class Board:
         
         Returns
         ----------
-        tuple[int, int, int, int]
+        list[tuple[int, int, int, int]]
             Move that gives us winning condition (start_down, start_right, end_down, end_right)
         """
         enemy_col: Color
@@ -358,11 +358,13 @@ class Board:
             enemy_col = Color.BLACK
         else:
             enemy_col = Color.WHITE
-        
+        lst: list
+        lst = []
+
         # 1) We already checked our enemy, its over if it is our move
         if self.check(enemy_col):
-            return -1, -1, -1, -1
-
+            lst.append((-1, -1, -1, -1))
+            return lst
         # 2) We have to do something to win
 
         for i, item_i in enumerate(self.s):
@@ -390,8 +392,8 @@ class Board:
                                 continue
                             # Now we know that enemy is checked. Can he escape?  
                             if temp_board.avoid_check(enemy_col) is False:
-                                return fig.down, fig.right, k, l
-        return None, None, None, None
+                                lst.append((fig.down, fig.right, k, l))
+        return lst
 
             
 
