@@ -1,9 +1,19 @@
-# Rekrutacja-Robocik
-Programy rekrutacyjne do koła Robocik
 
-Uruchamianie
+![TOFIC](/pics/main.png)
 
-zadanie1 -->    python server <"url": str> <"port": int>
-                python boat <"t": float> <"n": int> <"url:port": str>
 
-zadanie2 -->    python -m chess <file: str>
+# Rekrutacja Robocik
+
+Zrealizowano zadania: 1 oraz 2
+
+## Jak to uruchomić?
+
+
+
+## Autorzy
+
+* **Patryk Szelewski** - [GitHub](https://github.com/pszelew)
+* **Daniel Ślwiowski** - [GitHub](https://github.com/DSliwowski1)
+* **Jakub Tomaszewski** - [GitHub](https://github.com/TomaszewskiJakub)
+## Co dalej?
+* Algorytm wykrywania pasa ruchu w oparciu o Deep Learning
