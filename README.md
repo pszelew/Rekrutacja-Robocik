@@ -1,7 +1,3 @@
-
-![TOFIC](/pics/main.png)
-
-
 # Rekrutacja Robocik
 
 Zrealizowano zadania: 1 oraz 2
