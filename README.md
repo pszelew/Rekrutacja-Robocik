@@ -1,8 +1,20 @@
-# Rekrutacja-Robocik
-Programy rekrutacyjne do koła Robocik
+# Rekrutacja Robocik
 
-Uruchamianie
-zadanie1 -->    python server <"url": str> <"port": int>
-                python boat <"t": float> <"n": int> <"url:port": str>
+Zrealizowano zadania: 1 oraz 2
 
-zadanie2 -->    python -m chess <file: str>
+## Jak to uruchomić?
+W odpowiednim katalogu wpisz:
+* **zadanie1**
+	
+	- **python server http://localhost 8080** (przykład)
+	- **python boat 10.0 10 http://localhost:8080** (przykład)
+	- **python server** (by uzyskać pomoc)
+	- **python server** (by uzyskać pomoc)
+
+* **zadanie2** 
+	- **python chess board.state** (przykład)
+
+
+## Autorzy
+
+* **Patryk Szelewski** - [GitHub](https://github.com/pszelew)
