@@ -23,7 +23,7 @@ class Board:
         Dictionary of relation: in_game coordinates --> real board. Vertical axis
     Methods
     -------
-    free(tuple[int, int])
+    free(pos: tuple[int, int])
         Sprawdza czy pole jest wolne
     """
     def __init__(self, file: str):

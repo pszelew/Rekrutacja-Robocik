@@ -15,6 +15,3 @@ print(f"Test images array shape: {test_images.shape}")
 print(f"Train labels array shape: {train_labels.shape}")
 print(f"Test labels array shape: {test_labels.shape}")
 # Print those messages to be able to easly debug program
-
-
-my_conv_network.max_polling(np.expand_dims(train_images, axis=3), 2)
