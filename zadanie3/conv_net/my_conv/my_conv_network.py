@@ -84,15 +84,15 @@ class MyConvNetwork:
         self.layers = []
         self.batch_size: int
         self.batch_size = batch_size
-        self.layers.append(Conv((batch_size, 28, 28, 1), (batch_size, 26, 26, 32)))
+        self.layers.append(Conv("relu", (batch_size, 28, 28, 1), (batch_size, 26, 26, 32)))
         # First conv layer
         self.layers.append(MaxPooling((batch_size, 26, 26, 32), (batch_size, 13, 13, 32)))
         # Max pooling layer to reduce size
-        self.layers.append(Conv((batch_size, 13, 13, 32), (batch_size, 11, 11, 64)))
+        self.layers.append(Conv("relu", (batch_size, 13, 13, 32), (batch_size, 11, 11, 64)))
         # Second conv layer
         self.layers.append(MaxPooling((batch_size, 11, 11, 64), (batch_size, 5, 5, 64)))
         # Max pooling layer to reduce size
-        self.layers.append(Conv((batch_size, 5, 5, 64), (batch_size, 3, 3, 64)))
+        self.layers.append(Conv("relu", (batch_size, 5, 5, 64), (batch_size, 3, 3, 64)))
         # Third conv layer
         self.layers.append(Flatten((batch_size, 3, 3, 64), (batch_size, 576)))
         # Flatten layer to prepare data for Dense layers
@@ -161,22 +161,33 @@ class MyConvNetwork:
         c = 0
         for x, layer in enumerate(self.layers[::-1]):
             if x is 0:
-                prop = layer.back_first(self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)], train_labels, self.lr)
+                gradients, prop = layer.back_first(self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)], train_labels, self.lr)
+                self.weights[-1*(c+1)] = self.weights[-1*(c+1)] - self.lr * np.mean(gradients, axis=0, dtype=np.float64)
                 c += 1
+            elif x is 7:
+                gradients, prop = layer.back(prop,  self.layers[-1*(x+1)].input, self.weights[-1*(c+1)], self.bias[-1*(c+1)], train_labels, self.lr)
+                self.weights[-1*(c+1)] = self.weights[-1*(c+1)] - self.lr * np.mean(gradients, axis=0, dtype=np.float64)
+                
+                c += 1    
             else:
                 if layer.name is "conv":
-                    #prop = layer.back(prop)
+                    print("fasfs")
+                    print(prop)
+                    gradients, prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)], self.weights[-1*c], self.lr)
+                    self.weights[-1*(c+1)] = self.weights[-1*(c+1)] - self.lr * np.mean(gradients, axis=0, dtype=np.float64)
                     c += 1
-                    pass 
                 elif layer.name is "dense":
-                    prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)], self.weights[-1*c], self.lr)
+                    gradients, prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)], self.weights[-1*c], self.lr)
+                    self.weights[-1*(c+1)] = self.weights[-1*(c+1)] - self.lr * np.mean(gradients, axis=0, dtype=np.float64)
                     c += 1
-                    pass
                 elif layer.name is "flatten":
-                    # prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(x)], self.lr)
+                    #print(prop.max())
+                    prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(x)], self.lr)
+                    print("flat")
+                    print(prop)
                     pass
                 elif layer.name is "max_pooling":
-                    # layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*c], self.lr)
+                    prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*c], self.lr)
                     pass
                 else:
                     print("Layer not found!")

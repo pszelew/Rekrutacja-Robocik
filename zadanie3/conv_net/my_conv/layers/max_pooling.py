@@ -46,13 +46,23 @@ class MaxPooling(Layer):
         self.activation_val = out_arr
         return out_arr
     def back(self, prop: np.array, prev_output: np.array, next_weights: np.array, lr: np.float64):
+        print("Start max pooling")
         inverse_max_pooling:np.array
-        inverse_max_pooling = np.zeros(prev_output.shape[1:])
-        print(next_weights.shape)
-        for channel in range(inverse_max_pooling.shape[-1]):
-            for i in range(inverse_max_pooling.shape[0]):
-                for j in range(inverse_max_pooling.shape[1]):
-                    for k in range(self.n):
-                        for l in range(self.n):
-                            if self.output[batch][i][j][ch]:
-                                pass
+        #print(self.input_dims)
+        inverse_max_pooling = np.zeros(self.input_dims)
+        #print(prop.shape)
+        #print(next_weights.shape)
+        for batch in range(inverse_max_pooling.shape[0]): 
+            for channel in range(inverse_max_pooling.shape[3]):
+                for i in range(self.output_dims[1]): #neuron num
+                    for j in range(self.output_dims[2]): #neuron num
+                        for k in range(self.n): #slide x pooling
+                            for l in range(self.n): #slide y pooling
+                                for x in range(next_weights.shape[0]): #slide x conv
+                                    for y in range(next_weights.shape[1]): #slide y conv
+                                        if self.output[batch][i][j][channel] == self.input[batch][k+i*2][l+j*2][channel]:
+                                            # print(inverse_max_pooling.shape)
+                                            # print(prop.shape)
+                                            # print(self.output_dims)
+                                            inverse_max_pooling[batch][k+i*2][l+j*2][channel] += prop[batch][i][j][channel]
+        return inverse_max_pooling

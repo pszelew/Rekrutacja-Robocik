@@ -33,8 +33,6 @@ class Dense(Layer):
         out_arr = np.zeros(out_dims)
         
         for i, data in enumerate(input):
-            print(weights.shape)
-            print(data.shape)
             self.activation_val[i] = np.matmul(weights, data) + bias
         out_arr = self.activation_fcn(self.activation_val)
         self.output = out_arr
@@ -105,17 +103,17 @@ class Dense(Layer):
         gradients = np.zeros_like(net_activation_derivative)
         prop: np.array
         prop = np.multiply(loss_derivative, net_out_derivative)
+        
         # It will propagate further. Later we return this
         for k in range(gradients.shape[0]):
             for i in range(gradients.shape[1]):
                 for j in range(gradients.shape[2]):
                     gradients[k][i][j] = net_activation_derivative[k][i][j] * prop[k][i] 
-        weights = weights - lr*gradients
         # Update weights
         
         #bias TBD
-
-        return prop
+        # print(gradients)
+        return gradients, prop
         
     def back(self, prop: np.array, prev_output: np.array, weights: np.array, bias: np.array, next_weights: np.array, lr: np.float64):
         loss_derivative: np.array
@@ -137,17 +135,13 @@ class Dense(Layer):
         # c) Calculate delta(activation)/delta(weights)
 
         prop = np.multiply(loss_derivative, out_derivative)
-
+        
         gradients = np.zeros_like(activation_derivative)
         for k in range(gradients.shape[0]):
             for i in range(gradients.shape[1]):
                 for j in range(gradients.shape[2]):
                     gradients[k][i][j] = activation_derivative[k][i][j] * prop[k][i] 
-        weights = weights - lr*gradients
-        #print(weights[0][0])
-        weights = weights - lr*gradients
-        #print(weights[0][0])
-        return prop
+        return gradients, prop
 
     def relu(self, arr: np.array) -> np.array:
         """ReLU function
@@ -279,7 +273,7 @@ class Dense(Layer):
         out_arr: np.array
         out_arr = np.zeros((net_out.shape[0], net_out.shape[1]))
         # print(gr_tru.shape)
-        print(gr_tru.shape)
+        
 
         for i, data in enumerate(net_out):
             y = gr_tru[i]

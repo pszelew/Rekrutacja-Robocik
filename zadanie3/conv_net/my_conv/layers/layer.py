@@ -10,3 +10,5 @@ class Layer():
         self.input = np.zeros((input_dims))
         self.activation_val = np.zeros((output_dims))
         self.output = np.zeros((output_dims))
+
+    
