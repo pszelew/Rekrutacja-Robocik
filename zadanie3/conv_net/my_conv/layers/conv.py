@@ -58,7 +58,7 @@ class Conv(Layer):
         self.output = self.relu(self.activation_val)
         return self.output
     def back(self, prop: np.array, prev_output: np.array, weights: np.array, bias: np.array, next_weights: np.array, lr: np.float64):
-        print("Start conv")
+        # print("Start conv")
         loss_derivative: np.array
         loss_derivative = prop
         out_derivative: np.array

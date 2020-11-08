@@ -1,9 +1,9 @@
 from __future__ import annotations
-from layers.layer import Layer
-from layers.conv import Conv
-from layers.dense import Dense
-from layers.flatten import Flatten
-from layers.max_pooling import MaxPooling
+from .layers.layer import Layer
+from .layers.conv import Conv
+from .layers.dense import Dense
+from .layers.flatten import Flatten
+from .layers.max_pooling import MaxPooling
 import numpy as np
 
 # Load numpy library
@@ -102,7 +102,27 @@ class MyConvNetwork:
         # Second dense layer. Output of network
 
 
-    
+    def crossentropy(self, net_out : np.array, gr_tru: np.array) -> np.float64:
+        """Crossentropy loss function
+
+        Parameters
+        ----------
+        net_out: np.array
+            Output of last layer neurons (batch_size, net_out_size)
+        ground truth: np.array
+            Ground truth for our outputs (batch_size, net_out_size)
+        Returns
+        -------
+        np.array
+            Loss value
+        """
+        out_arr: np.array
+        out_arr = np.zeros(net_out.shape[0])
+        # Return [batch_size] array
+        for i, data in enumerate(net_out):
+            y = gr_tru[i]
+            out_arr[i] = -1 * np.sum([y[i]*np.log10(data[i]) + ((1-y[i])*np.log10(1-data[i])) for i in range(len(data))])
+        return out_arr
     
     def forward(self, input_data: np.array) -> np.array:
         """Forward pass function
@@ -122,7 +142,7 @@ class MyConvNetwork:
         temp_data: np.array
         temp_data = input_data
         for layer in self.layers:
-            print("Forward z warstwa: " + layer.name)
+            # print("Forward z warstwa: " + layer.name)
             if layer.name is "conv":
                 temp_data = layer.forward(temp_data, self.weights[count_weights], self.bias[count_weights])
                 count_weights += 1
@@ -171,8 +191,8 @@ class MyConvNetwork:
                 c += 1    
             else:
                 if layer.name is "conv":
-                    print("fasfs")
-                    print(prop)
+                    #print("fasfs")
+                    #print(prop)
                     gradients, prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)], self.weights[-1*c], self.lr)
                     self.weights[-1*(c+1)] = self.weights[-1*(c+1)] - self.lr * np.mean(gradients, axis=0, dtype=np.float64)
                     c += 1
@@ -183,8 +203,8 @@ class MyConvNetwork:
                 elif layer.name is "flatten":
                     #print(prop.max())
                     prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(x)], self.lr)
-                    print("flat")
-                    print(prop)
+                    #print("flat")
+                    #print(prop)
                     pass
                 elif layer.name is "max_pooling":
                     prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*c], self.lr)
@@ -200,9 +220,10 @@ if __name__ == "__main__":
     # To test our defined functions
     train_images = np.random.rand(2, 28, 28, 1)
     train_images = train_images/train_images.max()
-     
     test_labels = np.array([[1,0,0,0,0,0,0,0,0,0], [1,0,0,0,0,0,0,0,0,0]])
     test_labels = test_labels/test_labels.max()
-    my_conv.forward(train_images)
-    #print(my_conv.layers[-1].output)
-    my_conv.backward(test_labels)
+
+    for i in range(20):
+        result = my_conv.forward(train_images)
+        print(f"Loss: {my_conv.crossentropy(result, test_labels)}")
+        my_conv.backward(test_labels)

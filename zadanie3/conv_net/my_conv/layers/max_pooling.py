@@ -46,7 +46,7 @@ class MaxPooling(Layer):
         self.activation_val = out_arr
         return out_arr
     def back(self, prop: np.array, prev_output: np.array, next_weights: np.array, lr: np.float64):
-        print("Start max pooling")
+        #print("Start max pooling")
         inverse_max_pooling:np.array
         #print(self.input_dims)
         inverse_max_pooling = np.zeros(self.input_dims)
