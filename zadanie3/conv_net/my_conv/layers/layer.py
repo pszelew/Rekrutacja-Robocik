@@ -7,4 +7,6 @@ class Layer():
         self.name = name
         self.input_dims = input_dims
         self.output_dims = output_dims
+        self.input = np.zeros((input_dims))
         self.activation_val = np.zeros((output_dims))
+        self.output = np.zeros((output_dims))

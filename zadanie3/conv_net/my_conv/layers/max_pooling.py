@@ -1,4 +1,4 @@
-from conv import Layer
+from .layer import Layer
 import numpy as np
 
 
@@ -8,7 +8,7 @@ class MaxPooling(Layer):
         n: int
             Size of window (n x n) 
         """
-        super.__init__("max_pooling", input_dims, output_dims)
+        super().__init__("max_pooling", input_dims, output_dims)
         self.n = n
     def forward(self, arr: np.array):
         """Max-pooling operation
@@ -45,3 +45,14 @@ class MaxPooling(Layer):
                         out_arr[i][k][l][j] = np.max(slice[k*self.n:(k+1)*self.n, l*self.n:(l+1)*self.n])
         self.activation_val = out_arr
         return out_arr
+    def back(self, prop: np.array, prev_output: np.array, next_weights: np.array, lr: np.float64):
+        inverse_max_pooling:np.array
+        inverse_max_pooling = np.zeros(prev_output.shape[1:])
+        print(next_weights.shape)
+        for channel in range(inverse_max_pooling.shape[-1]):
+            for i in range(inverse_max_pooling.shape[0]):
+                for j in range(inverse_max_pooling.shape[1]):
+                    for k in range(self.n):
+                        for l in range(self.n):
+                            if self.output[batch][i][j][ch]:
+                                pass

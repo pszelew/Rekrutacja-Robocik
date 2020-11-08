@@ -12,7 +12,7 @@ print("Loading my_network_network")
 print(f"Numpy version {np.__version__}")
 # Print image to know that we loaded our network package
 
-# Proposed network structure
+# Proposed network structure. Loss function = categorical_crossentropy
 # 1) conv2d(3x3)
 # 2) max_polling(2x2)
 # 3) conv2d(3x3)
@@ -50,29 +50,34 @@ class MyConvNetwork:
     conv2d_forward(input: np.array, weights: np.array, bias: np.array) -> np.array:
         max-polling operation
     """
-    def __init__(self, batch_size: int = 10, lr: float = 0.001):
+    def __init__(self, lr: float = 0.001, batch_size: int = 2):  
         self.lr: float
         self.lr = lr
         self.weights: list
         self.weights = []
-        self.weights.append(np.random.rand(3, 3, 1, 32))
+        
+        self.weights.append(np.random.normal(size=(3, 3, 1, 32))*np.sqrt(2/32))
         # Weights for 1st conv layer
-        self.weights.append(np.random.rand(3, 3, 32, 64))
+        self.weights.append(np.random.normal(size=(3, 3, 32, 64))*np.sqrt(2/32))
         # Weights for 2nd conv layer
-        self.weights.append(np.random.rand(64, 576))
+        self.weights.append(np.random.normal(size=(3, 3, 64, 64))*np.sqrt(2/64))
+        # Weights for 3rd conv layer
+        self.weights.append(np.random.normal(size=(64, 576))*np.sqrt(2/576))
         # Weights for 1nd dense layer
-        self.weights.append(np.random.rand(10, 64))
+        self.weights.append(np.random.normal(size=(10, 64))*np.sqrt(2/64))
         # Weights for 2nd dense layer
 
         self.bias: list
         self.bias = []
-        self.bias.append(np.random.rand(32))
+        self.bias.append(np.zeros(32))
         # Bias for 1st conv layer
-        self.bias.append(np.random.rand(64))
+        self.bias.append(np.zeros(64))
         # Bias for 2nd conv layer
-        self.bias.append(np.random.rand(576))
+        self.bias.append(np.zeros(64))
+        # Bias for 3nd conv layer
+        self.bias.append(np.zeros(64))
         # Bias for 1st dense layer
-        self.bias.append(np.random.rand(64))
+        self.bias.append(np.zeros(10))
         # Bias for 2nd dense layer
 
         self.layers: list
@@ -91,66 +96,21 @@ class MyConvNetwork:
         # Third conv layer
         self.layers.append(Flatten((batch_size, 3, 3, 64), (batch_size, 576)))
         # Flatten layer to prepare data for Dense layers
-        self.layers.append(Dense(self.relu, (batch_size, 576), (batch_size, 64)))
+        self.layers.append(Dense("relu", (batch_size, 576), (batch_size, 64)))
         # First dense layer
-        self.layers.append(Dense(self.softmax, (batch_size, 64), (batch_size, 10)))
+        self.layers.append(Dense("softmax", (batch_size, 64), (batch_size, 10)))
         # Second dense layer. Output of network
 
-    def relu(self, arr: np.array) -> np.array:
-        """ReLU function
 
-        Parameters
-        ----------
-        arr: np.array
-            Input array of ReLU function
-
-        Returns
-        -------
-        np.float64
-            Result of ReLU function
-        """
-        out_arr = np.zeros_like(arr)
-        # Output array
-        for i, item in enumerate(arr):
-            if item > 0:
-                out_arr[i] = item
-            else:
-                out_arr[i] = np.float64(0)
-        return out_arr
-
-    def softmax(self, arr: np.array) -> np.array:
-        """softmax function
-
-        Parameters
-        ----------
-        arr: np.array
-            Input array of softmax function
-
-        Returns
-        -------
-        np.array
-            Result of softmax function
-        """
-        temp_lst: list
-        temp_lst = [] 
-        exp_sum: np.float64
-        exp_sum = np.sum([np.exp(item) for item in arr])
-        #calculate sum(e^zi)
-        for item in arr:
-            # For every value in our given array
-            temp_val: np.float64
-            temp_val = (np.exp(item))/(exp_sum)
-            temp_lst.append(temp_val)
-        return np.array(temp_lst)
-
-
+    
+    
     def forward(self, input_data: np.array) -> np.array:
         """Forward pass function
 
         Parameters
         ----------
         input_data: np.array
-            Input array of our network
+            Input array of our network (batch_size, 28, 28, 1)
 
         Returns
         -------
@@ -162,6 +122,7 @@ class MyConvNetwork:
         temp_data: np.array
         temp_data = input_data
         for layer in self.layers:
+            print("Forward z warstwa: " + layer.name)
             if layer.name is "conv":
                 temp_data = layer.forward(temp_data, self.weights[count_weights], self.bias[count_weights])
                 count_weights += 1
@@ -170,13 +131,15 @@ class MyConvNetwork:
                 count_weights += 1
             elif layer.name is "flatten":
                 temp_data = layer.forward(temp_data)
+                pass
             elif layer.name is "max_pooling":
                 temp_data = layer.forward(temp_data)
+                pass
             else:
                 print("Layer not found!")
                 exit()
         return temp_data
-        
+    
     def backward(self, train_labels):
         """Backward pass of our network
 
@@ -192,33 +155,43 @@ class MyConvNetwork:
         np.array
             Prediction of network
         """
-
-        # for i in range(self.layers.count):
-            
-
+        prop: np.array
+        prop = np.array([])
+        c: int
+        c = 0
+        for x, layer in enumerate(self.layers[::-1]):
+            if x is 0:
+                prop = layer.back_first(self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)], train_labels, self.lr)
+                c += 1
+            else:
+                if layer.name is "conv":
+                    #prop = layer.back(prop)
+                    c += 1
+                    pass 
+                elif layer.name is "dense":
+                    prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)], self.weights[-1*c], self.lr)
+                    c += 1
+                    pass
+                elif layer.name is "flatten":
+                    # prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(x)], self.lr)
+                    pass
+                elif layer.name is "max_pooling":
+                    # layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*c], self.lr)
+                    pass
+                else:
+                    print("Layer not found!")
+                    exit()
+        return prop
+        
+        
 if __name__ == "__main__":
     my_conv = MyConvNetwork()
     # To test our defined functions
-    test_conv = np.array([[
-        [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]],
-        [[2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8]],
-        [[3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9]],
-        [[4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10]],
-        [[5, 6], [6, 7], [7, 8], [8, 9], [9, 10], [10, 11]],
-        [[6, 7], [7, 8], [8, 9], [9, 10], [10, 11], [11, 12]]]]
-    )
-    weights_conv = np.random.rand(3, 3, 2, 32)
-    bias_conv = np.random.rand(32)
-    # print(test_pooling.shape)
-    # print(type(my_conv.relu(np.float64(1.3))))
-    # print(my_conv.softmax(np.array([15, 0.4, 1])))
-    # print((my_conv.max_pooling(test_pooling, 2)).shape)
-    print("Conv:")
-    #print(my_conv.conv2d_forward(test_conv, weights_conv, bias_conv))
-    
-    test_dense = np.array([[1, 2, 3],[4, 5, 6]])
-    weights_dense = np.random.rand(2, 3)
-    # outputs, inputs
-    bias_dense = np.random.rand(2)
-    print("Dense:")
-    #print(my_conv.dense(my_conv.relu, test_dense, weights_dense, bias_dense))
+    train_images = np.random.rand(2, 28, 28, 1)
+    train_images = train_images/train_images.max()
+     
+    test_labels = np.array([[1,0,0,0,0,0,0,0,0,0], [1,0,0,0,0,0,0,0,0,0]])
+    test_labels = test_labels/test_labels.max()
+    my_conv.forward(train_images)
+    #print(my_conv.layers[-1].output)
+    my_conv.backward(test_labels)

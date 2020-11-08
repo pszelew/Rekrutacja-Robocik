@@ -1,11 +1,11 @@
 from __future__ import annotations
-from conv import Layer
+from .layer import Layer
 import numpy as np
 
 
 class Conv(Layer):
     def __init__(self, input_dims: tuple, output_dims: tuple):
-        super.__init__("conv", input_dims, output_dims)
+        super().__init__("conv", input_dims, output_dims)
         
     def forward(self, input: np.array, weights: np.array, bias: np.array):
         """Conv net operation
@@ -22,10 +22,12 @@ class Conv(Layer):
         np.array
             Output of the conv layer
         """
+        self.input = input
         n = weights.shape[0]
         # Window size
-        print(input.shape)
+        #print(input.shape)
         temp_shape = input.shape
+        #print(f"Dlugosc rozmiary{weights.shape}")
         out_dims = (temp_shape[0], temp_shape[1]-weights.shape[0]+1, temp_shape[2]-weights.shape[1]+1, weights.shape[3])
         # Dimensions of output. They are defined by weight array
         out_arr: np.array
@@ -48,5 +50,7 @@ class Conv(Layer):
                         res: np.float64
                         res = np.sum(np.multiply(image[k:k+n, l:l+n, :], filt)) + bias[j]
                         out_arr[i][k][l][j] = res
-        self.activation_val = out_arr
+        self.activation_val = self.output = out_arr
         return out_arr
+    def back(self, prop: np.array):
+        pass
