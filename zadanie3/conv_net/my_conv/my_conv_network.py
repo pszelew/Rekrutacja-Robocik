@@ -158,6 +158,7 @@ class MyConvNetwork:
             else:
                 print("Layer not found!")
                 exit()
+            #print(f"Layer {layer.name} output: {layer.output.max()}")
         return temp_data
     
     def backward(self, train_labels):
@@ -181,33 +182,32 @@ class MyConvNetwork:
         c = 0
         for x, layer in enumerate(self.layers[::-1]):
             if x is 0:
-                gradients, prop = layer.back_first(self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)], train_labels, self.lr)
+                gradients, prop = layer.back_first(self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)], train_labels)
                 self.weights[-1*(c+1)] = self.weights[-1*(c+1)] - self.lr * np.mean(gradients, axis=0, dtype=np.float64)
                 c += 1
             elif x is 7:
-                gradients, prop = layer.back(prop,  self.layers[-1*(x+1)].input, self.weights[-1*(c+1)], self.bias[-1*(c+1)], train_labels, self.lr)
+                gradients, prop = layer.back(prop,  self.layers[-1*(x+1)].input, self.weights[-1*(c+1)], self.bias[-1*(c+1)], train_labels)
                 self.weights[-1*(c+1)] = self.weights[-1*(c+1)] - self.lr * np.mean(gradients, axis=0, dtype=np.float64)
-                
                 c += 1    
             else:
                 if layer.name is "conv":
                     #print("fasfs")
                     #print(prop)
-                    gradients, prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)], self.weights[-1*c], self.lr)
+                    gradients, prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)])
                     self.weights[-1*(c+1)] = self.weights[-1*(c+1)] - self.lr * np.mean(gradients, axis=0, dtype=np.float64)
                     c += 1
                 elif layer.name is "dense":
-                    gradients, prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)], self.weights[-1*c], self.lr)
+                    gradients, prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(c+1)], self.bias[-1*(c+1)], self.weights[-1*c])
                     self.weights[-1*(c+1)] = self.weights[-1*(c+1)] - self.lr * np.mean(gradients, axis=0, dtype=np.float64)
                     c += 1
                 elif layer.name is "flatten":
                     #print(prop.max())
-                    prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(x)], self.lr)
+                    prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*(x)])
                     #print("flat")
                     #print(prop)
                     pass
                 elif layer.name is "max_pooling":
-                    prop = layer.back(prop, self.layers[-1*(x+2)].output, self.weights[-1*c], self.lr)
+                    prop = layer.back(prop, self.layers[-1*(x+2)].output)
                     pass
                 else:
                     print("Layer not found!")

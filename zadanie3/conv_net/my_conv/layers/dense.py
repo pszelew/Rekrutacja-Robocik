@@ -1,15 +1,51 @@
 from .layer import Layer
 import numpy as np
-
+from numpy import savetxt
 
 class Dense(Layer):
+    """
+    A  class used to represent Dense layer
+    
+    Methods
+    -------
+    forward(self, arr: np.array) -> np.array
+        Returns result of forward propagation
+    activation_derivative(self, weights: np.array, last_output: np.array) -> np.array:
+        Gives us derivative activation: delta(LayerInput)/ delta(Weights) 
+    back_first(self, prev_output: np.array, weights: np.array, bias: np.array, train_labels: np.array) -> (np.array, np.array):
+        Back propagate error derivative if its first layer of netwok
+    back(self, prop: np.array, prev_output: np.array, weights: np.array, bias: np.array, next_weights: np.array) -> (np.array, np.array):
+        Back propagate error derivative.
+    relu(self, arr: np.array) -> np.array:
+        ReLU operation. An array (2D) as input.
+    relu_derivative(self, arr: np.array) -> np.array:
+        ReLU function derivative. An array (2D) as input.
+    softmax(self, arr: np.array) -> np.array:
+        Softmax function for a batch of data (2D array)
+    softmax_derivative(self, arr: np.array) -> np.array:
+        Returns derivative of softmax function (2D array)
+    crossentropy(self, net_out : np.array, gr_tru: np.array) -> -> np.array:
+        Crossentropy loss function
+    crossentropy_derivative(self, net_out: np.array, gr_tru: np.array) -> np.array:
+        Crossentropy loss function derivative
+    """
     def __init__(self, activation_fcn: str, input_dims: tuple, output_dims: tuple):
+        """
+        Parameters
+        ----------
+        activation_fcn: str
+            Name of activation function: 'relu'/'softmax'
+        input_dims: tuple
+            Shape of input tensor
+        output_dims: tuple
+            Shape of output tensor
+        """
         super().__init__("dense", input_dims, output_dims)
         act_dic = {"relu": self.relu, "softmax": self.softmax}
         act_div_dic = {self.relu: self.relu_derivative, self.softmax: self.softmax_derivative}
         self.activation_fcn = act_dic[activation_fcn]
         self.activation_fcn_der = act_div_dic[self.activation_fcn] 
-    def forward(self, input: np.array, weights: np.array, bias: np.array):
+    def forward(self, input: np.array, weights: np.array, bias: np.array) -> np.array:
         """Dense layer of neural network
         Parameters
         ----------
@@ -63,22 +99,24 @@ class Dense(Layer):
                     out_arr[k][i][j] += data[j]
         return out_arr
         # Return average of derivatives for every data in batch
-    def back_first(self, prev_output: np.array, weights: np.array, bias: np.array, train_labels: np.array, lr: np.float64):
-        """Dense layer of neural network
+    def back_first(self, prev_output: np.array, weights: np.array, bias: np.array, train_labels: np.array):
+        """Dense layer back propagation if its first layer of network
         Parameters
         ----------
-        activation_fcn: function
-            Activation function of layer
-        input: np.array
-            Input array of max-pooling operation
+        prev_output: np.array
+            output of previous layer     
         weights: np.array
-            Array of weights
+            Weights connectig previous layer and current layer
         bias: np.array
             Added bias
+        train_labels: np.array
+            Ground true of our training
         Returns
         -------
-        np.array
-            Output of the dense layer
+        np.array:
+            Gradient: delta(loss)/delta(weights). Use it to update weight
+        np.array:
+            Values of loss derivative in CURRENT layer. Shape is output_dims!
         """
 
         # 1) For the last layer:
@@ -113,11 +151,36 @@ class Dense(Layer):
         
         #bias TBD
         # print(gradients)
+
+
+        # print("Dense1 prop -- saving to file")
+        # savetxt('prop_dense1.csv', prop[0, :], delimiter=',')
         return gradients, prop
         
-    def back(self, prop: np.array, prev_output: np.array, weights: np.array, bias: np.array, next_weights: np.array, lr: np.float64):
+    def back(self, prop: np.array, prev_output: np.array, weights: np.array, bias: np.array, next_weights: np.array):
+        """Dense layer back propagation
+        Parameters
+        ----------
+        prop: np.array
+            Loss of an error from next layer. The size is NEXT layer output_dims
+        prev_output: output of previous layer
+            Activation function of layer
+        weights: np.array
+            Weights connectig previous layer and current layer
+        bias: np.array
+            Added bias
+        next_weights: np.array
+            Weights connecting this layer to next layer
+        Returns
+        -------
+        np.array:
+            Gradient: delta(loss)/delta(weights). Use it to update weight
+        np.array:
+            Values of loss derivative in CURRENT layer. Shape is output_dims!
+        """
         loss_derivative: np.array
         loss_derivative = np.zeros((self.output_dims[0], self.output_dims[1]))
+    
         out_derivative: np.array
         activation_derivative: np.array
         for k in range(loss_derivative.shape[0]):
@@ -140,7 +203,10 @@ class Dense(Layer):
         for k in range(gradients.shape[0]):
             for i in range(gradients.shape[1]):
                 for j in range(gradients.shape[2]):
-                    gradients[k][i][j] = activation_derivative[k][i][j] * prop[k][i] 
+                    gradients[k][i][j] = activation_derivative[k][i][j] * prop[k][i]
+
+        # print("Dense2 prop -- saving to file")
+        # savetxt('prop_dense2.csv', prop[0, :], delimiter=',')
         return gradients, prop
 
     def relu(self, arr: np.array) -> np.array:
@@ -171,7 +237,7 @@ class Dense(Layer):
 
         Returns
         -------
-        np.float64
+        np.array
             Result of ReLU derivative function
         """
         out_arr: np.array
@@ -234,7 +300,7 @@ class Dense(Layer):
         # Return average derivative
 
 
-    def crossentropy(self, net_out : np.array, gr_tru: np.array) -> np.float64:
+    def crossentropy(self, net_out : np.array, gr_tru: np.array) -> np.array:
         """Crossentropy loss function
 
         Parameters

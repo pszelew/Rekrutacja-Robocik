@@ -1,10 +1,35 @@
-from __future__ import annotations
 from .layer import Layer
 import numpy as np
-
+from numpy import savetxt
 
 class Conv(Layer):
+    """
+    A  class used to represent convolutional layer
+    
+    Methods
+    -------
+    forward(self, arr: np.array) -> np.array
+        Returns the result of forward propagation
+    activation_derivative(self, weights: np.array, last_output: np.array) -> np.array:
+        Gives us derivative activation: delta(LayerInput)/ delta(Weights) 
+    back(self, prop: np.array, prev_output: np.array, weights: np.array, bias: np.array) -> (np.array, np.array):
+        Back propagate error derivative.
+    relu(self, arr: np.array) -> np.array:
+        ReLU operation. An array (4D) as input.
+    relu_derivative(self, arr: np.array) -> np.array:
+        ReLU function derivative. An array (4D) as input.
+    """
     def __init__(self, activation_fcn: str, input_dims: tuple, output_dims: tuple):
+        """
+        Parameters
+        ----------
+        activation_fcn: str
+            Name of activation function: 'relu'/'softmax'
+        input_dims: tuple
+            Shape of input tensor
+        output_dims: tuple
+            Shape of output tensor
+        """
         super().__init__("conv", input_dims, output_dims)
         act_dic = {"relu": self.relu}
         act_div_dic = {self.relu: self.relu_derivative}
@@ -12,7 +37,7 @@ class Conv(Layer):
         self.activation_fcn_der = act_div_dic[self.activation_fcn] 
         
     def forward(self, input: np.array, weights: np.array, bias: np.array):
-        """Conv net operation
+        """Conv layer forward operation
         Parameters
         ----------
         input: np.array
@@ -30,7 +55,6 @@ class Conv(Layer):
         n = weights.shape[0]
         # Window size
         #print(input.shape)
-        temp_shape = input.shape
         #print(f"Dlugosc rozmiary{weights.shape}")
         out_dims = self.output_dims
         # Dimensions of output. They are defined by weight array
@@ -57,32 +81,47 @@ class Conv(Layer):
         self.activation_val = out_arr
         self.output = self.relu(self.activation_val)
         return self.output
-    def back(self, prop: np.array, prev_output: np.array, weights: np.array, bias: np.array, next_weights: np.array, lr: np.float64):
+    def back(self, prop: np.array, prev_output: np.array, weights: np.array, bias: np.array):
+        """Conv layer back propagation
+        Parameters
+        ----------
+        prop: np.array
+            Loss of an error in layer output. The size is THIS layer output_dims
+        prev_output: output of previous layer
+            Activation function of layer
+        weights: np.array
+            Weights connectig previous layer and current layer
+        bias: np.array
+            Added bias
+        Returns
+        -------
+        np.array:
+            Gradient: delta(loss)/delta(weights). Use it to update weight
+        np.array:
+            Values of loss derivative in PREVIOUS layer. Shape is input_dims!
+        """
+        
+        #print(prop.max())
         # print("Start conv")
+
         loss_derivative: np.array
         loss_derivative = prop
         out_derivative: np.array
         activation_derivative: np.array
-        # for k in range(loss_derivative.shape[0]):
-        #     for i in range(loss_derivative.shape[1]):
-        #         # For all neurons of current layer
-        #         for j in range(prop.shape[1]):
-        #             # Loss propagating from next layer
-        #             loss_derivative[k][i] += next_weights[j][i] * prop[k][j]
-        #             # Temp_der times weight connecting it to our neuron 
-
-
+       
         out_derivative = self.activation_fcn_der(self.activation_val)
-        #print(prop.shape)
-        ## b) Calculate delta(lay_out)/delta(activation)
+        # b) Calculate delta(lay_out)/delta(activation)
 
         activation_derivative = self.activation_derivative(weights, prev_output)
         # c) Calculate delta(activation)/delta(weights)
 
+
         prop = np.multiply(loss_derivative, out_derivative)
-        #print(prop.shape)
+
+        
         gradients = np.zeros((prev_output.shape[0], weights.shape[0], weights.shape[1], weights.shape[2], weights.shape[3]))
-        #print(gradients.shape)
+        
+
         for batch in range(gradients.shape[0]): #2 batch
             for x in range(activation_derivative.shape[1]): # 3 output
                 for y in range(activation_derivative.shape[2]): # 3 output
@@ -91,17 +130,18 @@ class Conv(Layer):
                             for k in range(gradients.shape[3]): #64 w
                                 for channel in range(gradients.shape[3]): #64 channel
                                     gradients[batch][i][j][k][channel] += activation_derivative[batch][x][y][i][j][k][channel] * prop[batch][x][y][channel]
-
-
         arr = np.zeros(self.input_dims)
-
+        
 
         for batch in range(arr.shape[0]):
             for i in range(prop.shape[1]): # Move right in prop
                 for j in range(prop.shape[2]): # Move left in prop
                     for channel in range(prop.shape[3]):
                         arr[batch, i:i+3, j:j+3, :] += prop[batch][i][j][channel] *  weights[..., channel]
-
+        
+        # print("Conv prop")
+        # savetxt('prop_conv.csv', prop[0, :, :, 0], delimiter=',')
+        
         prop = arr
         return gradients, prop
 
@@ -142,7 +182,7 @@ class Conv(Layer):
 
         Returns
         -------
-        np.float64
+        np.array
             Result of ReLU derivative function
         """
         out_arr: np.array
@@ -152,7 +192,7 @@ class Conv(Layer):
             for channel in range(arr.shape[-1]):
                 for i in range(arr.shape[1]):
                     for j in range(arr.shape[2]):
-                        if out_arr[batch][i][j][channel] > 0:
+                        if arr[batch][i][j][channel] > 0:
                             out_arr[batch][i][j][channel] = 1
                         else:
                             out_arr[batch][i][j][channel] = 0
@@ -192,7 +232,6 @@ class Conv(Layer):
                                     for channel in range(out_arr.shape[6]):
                                         # Channels
                                         out_arr[batch][i][j][k][l][m][channel] = last_output[batch][k][l][m]
-                                        #print(last_output.shape)
-                                
+                                        #print(last_output.shape)                        
         return out_arr
         # Return average of derivatives for every data in batch
