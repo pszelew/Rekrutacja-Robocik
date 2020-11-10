@@ -13,7 +13,9 @@ W odpowiednim katalogu wpisz:
 
 * **zadanie2** 
 	- **python chess board.state** (przykład)
-
+	
+* **zadanie3** 
+	- **python train.py** (przykład)
 
 ## Autorzy
 
